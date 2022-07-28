@@ -1,0 +1,125 @@
+/*************************************************************************
+	> File Name: 6.function.cpp
+	> Author: 秃头王
+	> Mail: 1658339000@qq.com
+	> Created Time: 2022年07月24日 星期日 21时18分55秒
+ ************************************************************************/
+
+#include <iostream>
+using namespace std;
+
+#define BEGINS(x) namespace x {
+#define ENDS(x) } // end of namespace x
+
+BEGINS(reference_param)
+
+template<typename T>
+struct remove_reference {
+    typedef T type;
+};
+
+template<typename T>
+struct remove_reference<T &> {
+    typedef T type;  
+};
+
+template<typename T>
+struct remove_reference<T &&> {
+    typedef T type;  
+};
+
+template<typename T>
+// 当前这个模板接收的是一个引用, 不是左值引用或者是右值引用
+void func(T &&a) {
+    typename remove_reference<T>::type c;
+    cout << "function T& a = " << a << endl;
+    return ;
+}
+
+int main() {
+    int n = 123;
+    func(n);
+    func(123);
+    // 左值引用 去掉&
+    typename remove_reference<int &&>::type a;
+    // 右值引用 去掉&&
+    typename remove_reference<int &>::type b;
+    typename remove_reference<int>::type c;
+    return 0;
+}
+
+ENDS(reference_param)
+
+// 添加const限定
+BEGINS(addConst)
+
+template<typename T>
+struct add_const {
+    typedef const T type;
+};
+// 为什么还有个偏特化 const T 传入上面的类模板中中就 会变参 const const T
+template<typename T>
+struct add_const<const T> {
+    typedef const T type;
+};
+
+template<typename T>
+void func(T a) {
+    typename add_const<T>::type c = 456;
+    // c = 890;
+    cout << "function T& a = " << a << endl;
+    return ;
+};
+
+
+int main() {
+    int n = 123;
+    func(n);
+    return 0;
+}
+ENDS(addConst)
+
+/*
+// 转换成左值引用
+BEGINS(addLvalueReference)
+
+/*
+template<typename T>
+struct add_lvalue_reference {
+
+};
+*/
+
+template<typename T>
+void func(T &&a) {
+    // typename add_lvalue_reference<T>::type c;
+    int t = 000;
+    typename add_lvalue_reference<T&&>::type a++ = t;
+    
+    cout << "function T& a = " << a << endl;
+    return ;
+}
+
+int main() {
+    func(123);
+    return 0;
+}
+
+ENDS(addLvaluerReference)
+
+BEGINS(bind_usage)
+
+int main() {
+    
+    return 0;
+}
+
+ENDS(bind_usage)
+
+int main() {
+    // reference_param::main();
+    // bind_usage::main();
+    // addConst::main();
+    addLvalueReference::main();
+    return 0;
+}
